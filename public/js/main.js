@@ -21,6 +21,14 @@ form.addEventListener("submit", async function() {
 })
 const searchForm = document.getElementById("searchForm")
 searchForm.addEventListener("submit", async function() {
+    event.preventDefault()
     const searchInput = document.getElementById("searchInput").value
     const searchData = await fetch("/todos/" + searchInput)
+    const searchDataJson = await searchData.json()
+    console.log(searchDataJson)
+    for (let i = 0; i < searchDataJson.length; i++) {
+        const todoElement = document.createElement("ul")
+        todoElement.textContent = searchDataJson[i]
+        document.getElementById("searchResults").appendChild(todoElement)
+    }
 })
