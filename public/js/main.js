@@ -24,7 +24,7 @@ form.addEventListener("submit", async function() {
 const searchForm = document.getElementById("searchForm")
 searchForm.addEventListener("submit", async function() {
     event.preventDefault()
-    document.getElementById("searchResults").textContent = ""
+    document.getElementById("todoList").textContent = ""
     const searchInput = document.getElementById("searchInput")
     const searchData = await fetch("/todos/" + searchInput.value)
     const searchDataJson = await searchData.json()
@@ -42,7 +42,7 @@ searchForm.addEventListener("submit", async function() {
             todoElement.textContent = searchDataJson[i]
             todoElement.href = "#"
             todoLiElement.appendChild(todoElement)
-            document.getElementById("searchResults").appendChild(todoLiElement)
+            document.getElementById("todoList").appendChild(todoLiElement)
             todoElement.addEventListener("click", async function() {
                 event.preventDefault()
                 const deleteTodo = await fetch("/update", {
@@ -83,6 +83,6 @@ deleteUserBtn.addEventListener("click", async function() {
     })
     const deleteMessage = await deleteData.text()
     deleteMessageElement.textContent = deleteMessage
-    document.getElementById("searchResults").textContent = ""
+    document.getElementById("todoList").textContent = ""
     deleteUserBtn.hidden = true
 })
