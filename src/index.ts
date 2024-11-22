@@ -33,11 +33,22 @@ router.get("/todos/:id", (req: Request, res: Response) => {
     const name = req.params.id;
     const user = users.find(u => u.name === name);
     if(user) {
-        
         res.send(user.todos)
+    }else{
+        res.send({
+            message: "User not found"
+        })
+    }
+})
+router.delete("/delete", (req: Request, res: Response) => {
+    const {name} = req.body;
+    console.log(name)
+    const user = users.find(u => u.name === name);
+    if(user) {
+        users.splice(users.indexOf(user), 1)
+        res.send("User deleted successfully")
     }else{
         res.send("User not found")
     }
 })
-
 export default router;
