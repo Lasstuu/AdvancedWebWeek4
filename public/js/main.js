@@ -24,8 +24,9 @@ form.addEventListener("submit", async function() {
 const searchForm = document.getElementById("searchForm")
 searchForm.addEventListener("submit", async function() {
     event.preventDefault()
-    const searchInput = document.getElementById("searchInput").value
-    const searchData = await fetch("/todos/" + searchInput)
+    document.getElementById("searchResults").textContent = ""
+    const searchInput = document.getElementById("searchInput")
+    const searchData = await fetch("/todos/" + searchInput.value)
     const searchDataJson = await searchData.json()
     const userSearchMsg = document.getElementById("userSearchMsg")
     userSearchMsg.textContent = ""
@@ -35,15 +36,38 @@ searchForm.addEventListener("submit", async function() {
     }
     else{
         for (let i = 0; i < searchDataJson.length; i++) {
-            const todoElement = document.createElement("ul")
+            const todoLiElement = document.createElement("li")
+            const todoElement = document.createElement("a")
+            todoElement.className = "delete-task"
             todoElement.textContent = searchDataJson[i]
-            document.getElementById("searchResults").appendChild(todoElement)
+            todoElement.href = "#"
+            todoLiElement.appendChild(todoElement)
+            document.getElementById("searchResults").appendChild(todoLiElement)
+            todoElement.addEventListener("click", async function() {
+                event.preventDefault()
+                const deleteTodo = await fetch("/update", {
+                    method: "put",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        "name": searchInput.value,
+                        "todo": todoElement.textContent
+                    })
+                })
+                const deleteMessageTodo = await deleteTodo.text()
+                deleteMessageElement.textContent = deleteMessageTodo
+                todoElement.parentElement.remove()
+                
+            })
         }
         deleteUserBtn.hidden = false
+       
     }
     
-    
 })
+
+
 deleteUserBtn.addEventListener("click", async function() {
     event.preventDefault()
     

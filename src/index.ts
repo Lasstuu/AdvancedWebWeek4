@@ -1,6 +1,8 @@
 import {Request, Response, Router } from "express";
 import fs from "fs";
 
+
+
 const router: Router = Router();
 
 type TUser = {
@@ -10,7 +12,16 @@ type TUser = {
 
 let users: TUser[] = []
 
-//users.push({name: "Lassi", todos: ["Buy milk"]});
+fs.readFile("data.json", "utf-8", (err:NodeJS.ErrnoException | null, data: string) => {
+    if(err){
+        console.log(err)
+        return
+    }try{
+        users = JSON.parse(data)
+    }catch (error : any){
+        console.error(`Error parsing JSON: ${error}`)
+    }
+})
 
 router.post("/add", (req: Request, res: Response) => {
     const {name, todos} = req.body;
@@ -24,8 +35,13 @@ router.post("/add", (req: Request, res: Response) => {
         const newUser : TUser= {name, todos: [todos]};
         users.push(newUser)
     }
-    res.send(`Todo added successfully for user ${name}`)
     
+    fs.writeFile("data.json", JSON.stringify(users), (err: NodeJS.ErrnoException | null) => {
+        if(err){
+            console.log(err)
+        }
+        res.send(`Todo added successfully for user ${name}`)
+    })
    
 })
 
@@ -46,7 +62,31 @@ router.delete("/delete", (req: Request, res: Response) => {
     const user = users.find(u => u.name === name);
     if(user) {
         users.splice(users.indexOf(user), 1)
-        res.send("User deleted successfully")
+        fs.writeFile("data.json", JSON.stringify(users), (err: NodeJS.ErrnoException | null) => {
+            if(err){
+                console.log(err)
+            }
+            res.send("User deleted successfully")
+        })
+        
+    }else{
+        res.send("User not found")
+    }
+})
+
+router.put("/update", (req: Request, res: Response) => {
+    const {name, todo} = req.body;
+    console.log(name, todo)
+    const user = users.find(u => u.name === name);
+    if(user) {
+        user.todos.splice(user.todos.indexOf(todo), 1)
+        fs.writeFile("data.json", JSON.stringify(users), (err: NodeJS.ErrnoException | null) => {
+            if(err){
+                console.log(err)
+            }
+            res.send("Todo deleted successfully")
+        })
+        
     }else{
         res.send("User not found")
     }
